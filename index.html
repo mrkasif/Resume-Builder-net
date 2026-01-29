@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resume Creator | Kashif Sayyad</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <section class="resume-builder">
+        <div class="container">
+            <h1>Resume Creator</h1>
+            <div class="resume_container">
+                <form class="inputField">
+                    <input type="text" name="name" placeholder="Your Full Name" />
+                    <input type="text" name="title" placeholder="Title/Sub Heading" />
+                    <input type="text" name="objective" placeholder="Professional Objective" />
+                    
+                    <textarea name="work_experience" placeholder="Work Experience" rows="3"></textarea>
+                    <textarea name="academic_details" placeholder="Academic Details" rows="3"></textarea>
+                    <textarea name="skills" placeholder="Skills (comma separated)" rows="3"></textarea>
+                    <textarea name="projects" placeholder="Projects" rows="3"></textarea>
+                    <textarea name="achievements" placeholder="Achievements" rows="3"></textarea>
+                    <textarea name="contact" placeholder="Contact Information" rows="3"></textarea>
+                </form>
+            </div>
+            <p class="tip">
+                **You can use HTML tags (like &lt;b&gt; or &lt;i&gt;) for text decoration**
+            </p>
+            <p class="credit">
+                Created by <a href="https://github.com/mrkasif" target="_blank">Kashif Sayyad</a>
+            </p>
+            <button class="main-btn" onclick="hide()">Generate Resume</button>
+        </div>
+    </section>
+
+    <div class="output-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
