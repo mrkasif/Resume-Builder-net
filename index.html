@@ -4,38 +4,298 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Resume Creator | Kashif Sayyad</title>
+    <title>Resume Maker | Kashif Sayyad</title>
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <section class="resume-builder">
-        <div class="container">
-            <h1>Resume Creator</h1>
-            <div class="resume_container">
-                <form class="inputField">
-                    <input type="text" name="name" placeholder="Your Full Name" />
-                    <input type="text" name="title" placeholder="Title/Sub Heading" />
-                    <input type="text" name="objective" placeholder="Professional Objective" />
-                    
-                    <textarea name="work_experience" placeholder="Work Experience" rows="3"></textarea>
-                    <textarea name="academic_details" placeholder="Academic Details" rows="3"></textarea>
-                    <textarea name="skills" placeholder="Skills (comma separated)" rows="3"></textarea>
-                    <textarea name="projects" placeholder="Projects" rows="3"></textarea>
-                    <textarea name="achievements" placeholder="Achievements" rows="3"></textarea>
-                    <textarea name="contact" placeholder="Contact Information" rows="3"></textarea>
-                </form>
-            </div>
-            <p class="tip">
-                **You can use HTML tags (like &lt;b&gt; or &lt;i&gt;) for text decoration**
-            </p>
-            <p class="credit">
-                Created by <a href="https://github.com/mrkasif" target="_blank">Kashif Sayyad</a>
-            </p>
-            <button class="main-btn" onclick="hide()">Generate Resume</button>
+    <header class="app-header">
+        <div class="app-title">
+            <h1>Resume Maker</h1>
+            <span>Create, customize &amp; export your resume</span>
         </div>
-    </section>
+        <div class="app-actions">
+            <button class="btn btn-primary" id="btnPrint" title="Print or save as PDF">Print / PDF</button>
+            <button class="btn" id="btnExport" title="Download your data as JSON">Export</button>
+            <button class="btn" id="btnImport" title="Load data from a JSON file">Import</button>
+            <input type="file" id="importFile" accept="application/json,.json" hidden />
+            <button class="btn btn-danger" id="btnReset" title="Restore the default sample data">Reset</button>
+        </div>
+    </header>
 
-    <div class="output-container"></div>
+    <main class="app-main">
+        <aside class="editor-panel">
+            <nav class="section-nav" id="sectionNav" aria-label="Sections"></nav>
+
+            <div class="editor-sections" id="editorSections">
+
+                <section class="ed-section" id="sec-settings">
+                    <header class="ed-section-head"><h2>Resume Settings</h2><span class="ed-toggle">&#8722;</span></header>
+                    <div class="ed-section-body">
+                        <div class="field-row">
+                            <label>Template
+                                <select id="setTemplate" data-path="settings.template">
+                                    <option value="classic">Classic</option>
+                                    <option value="modern">Modern</option>
+                                    <option value="minimal">Minimal</option>
+                                    <option value="bold">Bold</option>
+                                </select>
+                            </label>
+                            <label>Accent color
+                                <input type="color" id="setAccent" data-path="settings.accent" value="#2b3a67" />
+                            </label>
+                        </div>
+                        <div class="field-row">
+                            <label>Font size <output id="fontSizeOut">14</output>px
+                                <input type="range" id="setFontSize" data-path="settings.fontSize" min="11" max="18" step="1" value="14" />
+                            </label>
+                            <label>Line spacing
+                                <select id="setSpacing" data-path="settings.spacing">
+                                    <option value="compact">Compact</option>
+                                    <option value="normal" selected>Normal</option>
+                                    <option value="relaxed">Relaxed</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="sec-toggles" id="secToggles"></div>
+                    </div>
+                </section>
+
+                <section class="ed-section" id="sec-profile">
+                    <header class="ed-section-head"><h2>Personal Info</h2><span class="ed-toggle">&#8722;</span></header>
+                    <div class="ed-section-body">
+                        <div class="field-row">
+                            <label>Full name <input type="text" data-path="profile.fullName" placeholder="Jane Doe" /></label>
+                            <label>Job title <input type="text" data-path="profile.title" placeholder="Software Engineer" /></label>
+                        </div>
+                        <div class="field-row">
+                            <label>Email <input type="email" data-path="profile.email" placeholder="jane@example.com" /></label>
+                            <label>Phone <input type="tel" data-path="profile.phone" placeholder="+1 555 000 1234" /></label>
+                        </div>
+                        <div class="field-row">
+                            <label>Location <input type="text" data-path="profile.location" placeholder="San Francisco, CA" /></label>
+                            <label>Website <input type="text" data-path="profile.website" placeholder="jane.dev" /></label>
+                        </div>
+                        <div class="field-row">
+                            <label>LinkedIn <input type="text" data-path="profile.linkedin" placeholder="linkedin.com/in/janedoe" /></label>
+                            <label>GitHub <input type="text" data-path="profile.github" placeholder="github.com/janedoe" /></label>
+                        </div>
+                        <div class="photo-box">
+                            <img id="photoPreview" alt="profile photo" hidden />
+                            <div class="photo-actions">
+                                <label class="btn btn-small">Upload photo
+                                    <input type="file" id="photoInput" accept="image/*" hidden />
+                                </label>
+                                <button class="btn btn-small btn-danger" id="photoRemove" hidden>Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="ed-section" id="sec-summary">
+                    <header class="ed-section-head"><h2>Summary</h2><span class="ed-toggle">&#8722;</span></header>
+                    <div class="ed-section-body">
+                        <textarea data-path="summary" rows="4" placeholder="Write a short professional summary&hellip;"></textarea>
+                    </div>
+                </section>
+
+                <section class="ed-section" id="sec-experience">
+                    <header class="ed-section-head"><h2>Work Experience</h2><span class="ed-toggle">&#8722;</span></header>
+                    <div class="ed-section-body">
+                        <div class="card-list" id="experienceList"></div>
+                        <button class="btn btn-small btn-add" data-add="experience">+ Add Experience</button>
+                    </div>
+                </section>
+
+                <section class="ed-section" id="sec-education">
+                    <header class="ed-section-head"><h2>Education</h2><span class="ed-toggle">&#8722;</span></header>
+                    <div class="ed-section-body">
+                        <div class="card-list" id="educationList"></div>
+                        <button class="btn btn-small btn-add" data-add="education">+ Add Education</button>
+                    </div>
+                </section>
+
+                <section class="ed-section" id="sec-skills">
+                    <header class="ed-section-head"><h2>Skills</h2><span class="ed-toggle">&#8722;</span></header>
+                    <div class="ed-section-body">
+                        <div class="chip-add">
+                            <input type="text" id="skillName" placeholder="Skill name (e.g. React)" />
+                            <select id="skillLevel" title="Skill level">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4" selected>4</option>
+                                <option value="5">5</option>
+                            </select>
+                            <button class="btn btn-small" id="skillAdd">Add</button>
+                        </div>
+                        <div class="chip-list" id="skillsList"></div>
+                    </div>
+                </section>
+
+                <section class="ed-section" id="sec-projects">
+                    <header class="ed-section-head"><h2>Projects</h2><span class="ed-toggle">&#8722;</span></header>
+                    <div class="ed-section-body">
+                        <div class="card-list" id="projectsList"></div>
+                        <button class="btn btn-small btn-add" data-add="projects">+ Add Project</button>
+                    </div>
+                </section>
+
+                <section class="ed-section" id="sec-certifications">
+                    <header class="ed-section-head"><h2>Certifications</h2><span class="ed-toggle">&#8722;</span></header>
+                    <div class="ed-section-body">
+                        <div class="card-list" id="certificationsList"></div>
+                        <button class="btn btn-small btn-add" data-add="certifications">+ Add Certification</button>
+                    </div>
+                </section>
+
+                <section class="ed-section" id="sec-languages">
+                    <header class="ed-section-head"><h2>Languages</h2><span class="ed-toggle">&#8722;</span></header>
+                    <div class="ed-section-body">
+                        <div class="card-list" id="languagesList"></div>
+                        <button class="btn btn-small btn-add" data-add="languages">+ Add Language</button>
+                    </div>
+                </section>
+
+            </div>
+        </aside>
+
+        <section class="preview-panel">
+            <div class="preview-toolbar">
+                <span class="page-size-hint">A4 &middot; print-friendly</span>
+            </div>
+            <div class="page-wrap">
+                <article class="resume-page" id="resumePage"></article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>
+            Created by <a href="https://github.com/mrkasif" target="_blank" rel="noopener">Kashif Sayyad</a> &middot;
+            <span class="tip">Tip: text areas accept HTML tags like &lt;b&gt; or &lt;i&gt; for decoration</span>
+        </p>
+    </footer>
+
+    <template id="experience-tpl">
+        <div class="card" data-section="experience" data-index="__i__">
+            <div class="card-head">
+                <span class="card-title">Experience</span>
+                <div class="card-actions">
+                    <button type="button" class="icon-btn" data-action="up" title="Move up">&uarr;</button>
+                    <button type="button" class="icon-btn" data-action="down" title="Move down">&darr;</button>
+                    <button type="button" class="icon-btn danger" data-action="remove" title="Remove">&times;</button>
+                </div>
+            </div>
+            <div class="field-row">
+                <label>Job title <input type="text" data-path="experience.__i__.jobTitle" placeholder="Frontend Developer" /></label>
+                <label>Company <input type="text" data-path="experience.__i__.company" placeholder="Acme Corp" /></label>
+            </div>
+            <div class="field-row">
+                <label>Location <input type="text" data-path="experience.__i__.location" placeholder="Remote" /></label>
+                <label>Start <input type="month" data-path="experience.__i__.start" /></label>
+                <label>End <input type="month" data-path="experience.__i__.end" /></label>
+            </div>
+            <label>Highlights (one bullet per line)
+                <textarea data-path="experience.__i__.bullets" rows="3" placeholder="- Built the company dashboard&#10;- Led a team of 3 developers"></textarea>
+            </label>
+        </div>
+    </template>
+
+    <template id="education-tpl">
+        <div class="card" data-section="education" data-index="__i__">
+            <div class="card-head">
+                <span class="card-title">Education</span>
+                <div class="card-actions">
+                    <button type="button" class="icon-btn" data-action="up" title="Move up">&uarr;</button>
+                    <button type="button" class="icon-btn" data-action="down" title="Move down">&darr;</button>
+                    <button type="button" class="icon-btn danger" data-action="remove" title="Remove">&times;</button>
+                </div>
+            </div>
+            <div class="field-row">
+                <label>Degree <input type="text" data-path="education.__i__.degree" placeholder="B.Sc. Computer Science" /></label>
+                <label>School <input type="text" data-path="education.__i__.school" placeholder="State University" /></label>
+            </div>
+            <div class="field-row">
+                <label>Location <input type="text" data-path="education.__i__.location" placeholder="City, Country" /></label>
+                <label>Start <input type="text" data-path="education.__i__.start" placeholder="2016" /></label>
+                <label>End <input type="text" data-path="education.__i__.end" placeholder="2020" /></label>
+            </div>
+            <label>Details
+                <textarea data-path="education.__i__.details" rows="2" placeholder="Graduated with honors"></textarea>
+            </label>
+        </div>
+    </template>
+
+    <template id="projects-tpl">
+        <div class="card" data-section="projects" data-index="__i__">
+            <div class="card-head">
+                <span class="card-title">Project</span>
+                <div class="card-actions">
+                    <button type="button" class="icon-btn" data-action="up" title="Move up">&uarr;</button>
+                    <button type="button" class="icon-btn" data-action="down" title="Move down">&darr;</button>
+                    <button type="button" class="icon-btn danger" data-action="remove" title="Remove">&times;</button>
+                </div>
+            </div>
+            <div class="field-row">
+                <label>Name <input type="text" data-path="projects.__i__.name" placeholder="Resume Builder" /></label>
+                <label>Link <input type="text" data-path="projects.__i__.link" placeholder="github.com/you/project" /></label>
+            </div>
+            <div class="field-row">
+                <label>Start <input type="text" data-path="projects.__i__.start" placeholder="2026" /></label>
+                <label>End <input type="text" data-path="projects.__i__.end" placeholder="Present" /></label>
+            </div>
+            <label>Description
+                <textarea data-path="projects.__i__.description" rows="3" placeholder="What it does, your role, and the outcome&hellip;"></textarea>
+            </label>
+        </div>
+    </template>
+
+    <template id="certifications-tpl">
+        <div class="card" data-section="certifications" data-index="__i__">
+            <div class="card-head">
+                <span class="card-title">Certification</span>
+                <div class="card-actions">
+                    <button type="button" class="icon-btn" data-action="up" title="Move up">&uarr;</button>
+                    <button type="button" class="icon-btn" data-action="down" title="Move down">&darr;</button>
+                    <button type="button" class="icon-btn danger" data-action="remove" title="Remove">&times;</button>
+                </div>
+            </div>
+            <div class="field-row">
+                <label>Name <input type="text" data-path="certifications.__i__.name" placeholder="AWS Certified Developer" /></label>
+                <label>Issuer <input type="text" data-path="certifications.__i__.issuer" placeholder="Amazon Web Services" /></label>
+            </div>
+            <div class="field-row">
+                <label>Year <input type="text" data-path="certifications.__i__.year" placeholder="2025" /></label>
+            </div>
+        </div>
+    </template>
+
+    <template id="languages-tpl">
+        <div class="card" data-section="languages" data-index="__i__">
+            <div class="card-head">
+                <span class="card-title">Language</span>
+                <div class="card-actions">
+                    <button type="button" class="icon-btn" data-action="up" title="Move up">&uarr;</button>
+                    <button type="button" class="icon-btn" data-action="down" title="Move down">&darr;</button>
+                    <button type="button" class="icon-btn danger" data-action="remove" title="Remove">&times;</button>
+                </div>
+            </div>
+            <div class="field-row">
+                <label>Language <input type="text" data-path="languages.__i__.name" placeholder="English" /></label>
+                <label>Proficiency
+                    <select data-path="languages.__i__.level">
+                        <option value="">Select&hellip;</option>
+                        <option value="Basic">Basic</option>
+                        <option value="Conversational">Conversational</option>
+                        <option value="Professional">Professional</option>
+                        <option value="Native">Native</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+    </template>
+
+    <div class="toast" id="toast"></div>
 
     <script src="script.js"></script>
 </body>
